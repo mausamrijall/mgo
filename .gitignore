@@ -12,3 +12,4 @@
 # Example binaries
 examples/hello/hello
 examples/routing/routing
+examples/blog/blog
