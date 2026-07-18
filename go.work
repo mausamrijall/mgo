@@ -1,10 +1,13 @@
 go 1.26.5
 
 use (
+	./adapters/db-sql
 	./adapters/middleware-cors
+	./adapters/orm-gorm
 	./adapters/router-chi
 	./adapters/router-stdmux
 	./contracts
+	./examples/blog
 	./examples/hello
 	./examples/routing
 	./framework
