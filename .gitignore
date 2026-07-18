@@ -1,0 +1,14 @@
+# Design docs kept local for now
+/docs/
+
+# Environment files
+.env
+.env.*
+
+# Build artifacts
+*.test
+/bin/
+
+# Example binaries
+examples/hello/hello
+examples/routing/routing
