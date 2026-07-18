@@ -1,0 +1,3 @@
+di: graph validation failed:
+  - dependency cycle: *di_test.cycleA → *di_test.cycleB → *di_test.cycleA
+  - dependency cycle: *di_test.cycleB → *di_test.cycleA → *di_test.cycleB

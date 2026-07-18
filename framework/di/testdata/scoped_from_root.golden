@@ -1,0 +1,1 @@
+di: di_test.Repo is Scoped and cannot be resolved from the root container; chain: di_test.Repo

@@ -126,6 +126,15 @@ func (a *App) Boot(ctx context.Context) error {
 	}
 
 	for _, p := range a.providers {
+		if d, ok := p.(appc.Deferrable); ok {
+			if _, bootable := p.(appc.Bootable); bootable {
+				return fmt.Errorf("mgo: provider %T is both Deferrable and Bootable; deferred providers have no boot slot", p)
+			}
+			if err := a.c.Defer(func() error { return d.Register(a) }, d.Provides()...); err != nil {
+				return fmt.Errorf("mgo: defer %T: %w", p, err)
+			}
+			continue
+		}
 		if err := p.Register(a); err != nil {
 			return fmt.Errorf("mgo: register %T: %w", p, err)
 		}

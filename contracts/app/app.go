@@ -31,6 +31,16 @@ type Closable interface {
 	Close(ctx context.Context) error
 }
 
+// Deferrable providers register lazily: Register runs the first time one
+// of the keys returned by Provides is resolved, not during boot. Provides
+// returns typed nil pointers like (*T)(nil). A Deferrable provider must
+// not also be Bootable — deferred work has no boot slot; the kernel
+// rejects the combination.
+type Deferrable interface {
+	Provider
+	Provides() []any
+}
+
 // Runner is a long-running unit (HTTP server, queue worker, scheduler)
 // started by the app after boot. Run must block until ctx is cancelled or
 // a fatal error occurs; returning nil after cancellation is a clean stop.

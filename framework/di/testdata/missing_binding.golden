@@ -1,0 +1,2 @@
+di: graph validation failed:
+  - no binding for di_test.Repo (interfaces require an explicit binding); chain: *di_test.Service → di_test.Repo

@@ -1,0 +1,2 @@
+di: graph validation failed:
+  - lifetime violation: singleton *di_test.Service depends on scoped di_test.Repo; chain: *di_test.Service → di_test.Repo
