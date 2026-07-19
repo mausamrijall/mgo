@@ -1,16 +1,20 @@
 go 1.26.5
 
 use (
+	./adapters/auth-jwt
 	./adapters/db-sql
+	./adapters/hash-argon2
 	./adapters/middleware-cors
 	./adapters/migrate-goose
 	./adapters/orm-ent
 	./adapters/orm-gorm
 	./adapters/orm-sqlc
 	./adapters/router-chi
+	./adapters/session-scs
 	./adapters/router-stdmux
 	./cli
 	./contracts
+	./examples/authdemo
 	./examples/blog
 	./examples/hello
 	./examples/routing
