@@ -1,0 +1,33 @@
+// Command demo — an MGO application. MGO is glue, not a cage: the
+// router below is the router's own API, the handlers are net/http, and
+// removing MGO leaves working Go code.
+package main
+
+import (
+	"context"
+	"log/slog"
+	"os"
+
+	"github.com/mgo-framework/mgo/framework/conf"
+	"github.com/mgo-framework/mgo/framework/httpserver"
+	"github.com/mgo-framework/mgo/framework/mgo"
+)
+
+func main() {
+	cfg, err := conf.NewLoader().DotEnv(".env", true).Env("MGO_").Load()
+	if err != nil {
+		slog.Error("config", "error", err)
+		os.Exit(1)
+	}
+
+	router := newRouter()
+
+	app := mgo.New(
+		mgo.WithConfig(cfg),
+		mgo.WithProviders(httpserver.Provider("http", router)),
+	)
+	if err := app.Run(context.Background()); err != nil {
+		slog.Error("app failed", "error", err)
+		os.Exit(1)
+	}
+}

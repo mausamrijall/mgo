@@ -1,0 +1,24 @@
+package main
+
+import (
+	"net/http"
+
+	"github.com/mgo-framework/mgo/framework/web"
+)
+
+// Handlers are plain net/http. web.JSON / web.Bind are optional helpers —
+// ordinary functions over ResponseWriter and Request, not a framework Ctx.
+
+func helloHandler(w http.ResponseWriter, r *http.Request) {
+	web.JSON(w, http.StatusOK, map[string]string{"message": "hello from demo"})
+}
+
+func healthHandler(store *Store) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if err := store.Health(r.Context()); err != nil {
+			web.Error(w, http.StatusServiceUnavailable, err.Error())
+			return
+		}
+		web.JSON(w, http.StatusOK, map[string]string{"status": "ok"})
+	}
+}

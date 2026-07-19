@@ -9,6 +9,7 @@ use (
 	./adapters/orm-sqlc
 	./adapters/router-chi
 	./adapters/router-stdmux
+	./cli
 	./contracts
 	./examples/blog
 	./examples/hello

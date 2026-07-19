@@ -1,0 +1,26 @@
+package main
+
+import (
+	"database/sql"
+
+	dbsql "github.com/mgo-framework/mgo/adapters/db-sql"
+	_ "modernc.org/sqlite" // pure-Go database/sql driver "sqlite"
+)
+
+// Store is your data-access root: a *sql.DB with MGO's transaction and
+// health glue on top. Write plain SQL; inside store.InTx, get the
+// transaction-aware handle with dbsql.From(ctx, store).
+type Store = dbsql.DB
+
+func openStore(dsn string) (*Store, error) {
+	raw, err := sql.Open("sqlite", dsn)
+	if err != nil {
+		return nil, err
+	}
+	store := dbsql.New(raw)
+
+	// Create your schema here (or wire adapters/migrate-goose):
+	//   if _, err := store.Exec(`CREATE TABLE IF NOT EXISTS ...`); err != nil { ... }
+
+	return store, nil
+}

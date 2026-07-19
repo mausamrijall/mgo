@@ -1,0 +1,29 @@
+# demo
+
+An [MGO](https://github.com/mausamrijall/mgo) application — router: **stdmux**, database: **sql**.
+
+## Run
+
+```sh
+mgo dev        # run with hot reload
+go run .       # or plain go
+go test ./...  # tests were generated too — keep them green
+```
+
+## Make things
+
+```sh
+mgo make handler posts    # new handler + test
+mgo make provider cache   # new lifecycle provider
+mgo swap router stdmux    # switch stack axes; your edits are never overwritten
+```
+
+## How this app is put together
+
+- `main.go` — config, store, router, app lifecycle. Plain Go, ~30 lines.
+- `router.go` — routes in stdmux's native API. MGO never wraps your router.
+- `handlers.go` — plain `net/http` handlers; `web.JSON`/`web.Bind` are optional helpers.
+- `store.go` — your data-access root; queries are native sql code.
+- `mgo.json` — the stack manifest `mgo` uses for `swap`/`add`. Generated files are hash-tracked: once you edit one, `mgo` treats it as yours.
+
+Delete MGO any time: what remains is ordinary Go.

@@ -1,0 +1,25 @@
+package main
+
+import (
+	"net/http"
+
+	mgochi "github.com/mgo-framework/mgo/adapters/router-chi"
+	"github.com/mgo-framework/mgo/framework/middleware"
+)
+
+// newRouter builds the HTTP router. This is chi's native API — add routes
+// the chi way (r.Get, r.Post, r.Route, chi middleware, all of it).
+func newRouter(store *Store) http.Handler {
+	r := mgochi.New()
+	r.Use(
+		middleware.RequestID(),
+		middleware.Recover(nil),
+		middleware.Logger(nil),
+		middleware.SecureHeaders(),
+	)
+
+	r.Get("/", helloHandler)
+	r.Get("/healthz", healthHandler(store))
+
+	return r
+}

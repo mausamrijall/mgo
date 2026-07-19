@@ -1,0 +1,8 @@
+module demo
+
+go 1.26.5
+
+replace github.com/mgo-framework/mgo/contracts => /mgo/contracts
+replace github.com/mgo-framework/mgo/framework => /mgo/framework
+replace github.com/mgo-framework/mgo/adapters/router-chi => /mgo/adapters/router-chi
+replace github.com/mgo-framework/mgo/adapters/db-sql => /mgo/adapters/db-sql

@@ -1,0 +1,26 @@
+package main
+
+import (
+	"github.com/glebarez/sqlite"
+	mgogorm "github.com/mgo-framework/mgo/adapters/orm-gorm"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+)
+
+// Store is your data-access root: a *gorm.DB with MGO's transaction and
+// health glue on top. Use GORM natively; inside store.InTx, get the
+// transactional handle with mgogorm.From(ctx, store).
+type Store = mgogorm.DB
+
+func openStore(dsn string) (*Store, error) {
+	g, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{Logger: logger.Discard})
+	if err != nil {
+		return nil, err
+	}
+	store := mgogorm.New(g)
+
+	// Add your models here and they migrate at startup:
+	//   if err := store.AutoMigrator(&Post{}).Migrate(context.Background()); err != nil { ... }
+
+	return store, nil
+}

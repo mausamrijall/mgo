@@ -1,0 +1,5 @@
+module {{.Module}}
+
+go 1.26.5
+{{range .Replaces}}
+replace {{.Mod}} => {{.Path}}{{end}}

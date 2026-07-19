@@ -1,0 +1,26 @@
+package main
+
+import (
+	"net/http"
+
+	stdmux "github.com/mgo-framework/mgo/adapters/router-stdmux"
+	"github.com/mgo-framework/mgo/framework/middleware"
+)
+
+// newRouter builds the HTTP router. This is the stdlib ServeMux API — add
+// routes with Go 1.22 "METHOD /path/{param}" patterns and read params
+// with r.PathValue.
+func newRouter() http.Handler {
+	r := stdmux.New()
+	r.Use(
+		middleware.RequestID(),
+		middleware.Recover(nil),
+		middleware.Logger(nil),
+		middleware.SecureHeaders(),
+	)
+
+	r.HandleFunc("GET /{$}", helloHandler)
+	r.HandleFunc("GET /healthz", healthHandler())
+
+	return r
+}
