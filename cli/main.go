@@ -33,7 +33,7 @@ overwrite anything you have edited.`,
 	}
 	root.Version = version
 
-	root.AddCommand(newCmd(), swapCmd(), addCmd(), removeCmd(), makeCmd(), devCmd())
+	root.AddCommand(newCmd(), swapCmd(), addCmd(), removeCmd(), makeCmd(), devCmd(), infoCmd(), diffCmd(), doctorCmd())
 
 	if err := root.Execute(); err != nil {
 		fail("%v", err)

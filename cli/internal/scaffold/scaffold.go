@@ -229,6 +229,53 @@ func (m *Manifest) Modified(dir string, paths ...string) ([]string, error) {
 	return out, nil
 }
 
+// FileState classifies a tracked generated file against its recorded hash.
+type FileState string
+
+const (
+	Unchanged FileState = "unchanged" // safe to regenerate
+	Modified  FileState = "modified"  // user-edited; mgo will not touch it
+	Deleted   FileState = "deleted"   // removed by the user; taken over
+)
+
+// Status reports the state of every tracked generated file, sorted by path.
+func (m *Manifest) Status(dir string) ([]struct {
+	Path  string
+	State FileState
+}, error) {
+	paths := make([]string, 0, len(m.Generated))
+	for p := range m.Generated {
+		paths = append(paths, p)
+	}
+	sort.Strings(paths)
+	out := make([]struct {
+		Path  string
+		State FileState
+	}, 0, len(paths))
+	for _, p := range paths {
+		raw, err := os.ReadFile(filepath.Join(dir, p))
+		state := Unchanged
+		switch {
+		case os.IsNotExist(err):
+			state = Deleted
+		case err != nil:
+			return nil, err
+		case Hash(string(raw)) != m.Generated[p]:
+			state = Modified
+		}
+		out = append(out, struct {
+			Path  string
+			State FileState
+		}{p, state})
+	}
+	return out, nil
+}
+
+// untracked files are written but never hash-tracked: go tooling rewrites
+// go.mod legitimately (tidy, go get), and mgo evolves it with `go mod
+// edit` rather than regeneration — so "modified" would be noise.
+var untracked = map[string]bool{"go.mod": true}
+
 // WriteFiles writes rendered files under dir and records their hashes.
 func WriteFiles(dir string, files map[string]string, m *Manifest) error {
 	paths := make([]string, 0, len(files))
@@ -244,7 +291,7 @@ func WriteFiles(dir string, files map[string]string, m *Manifest) error {
 		if err := os.WriteFile(full, []byte(files[p]), 0o644); err != nil {
 			return err
 		}
-		if m != nil {
+		if m != nil && !untracked[p] {
 			m.Generated[p] = Hash(files[p])
 		}
 	}

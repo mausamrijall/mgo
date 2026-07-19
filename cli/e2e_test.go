@@ -105,4 +105,34 @@ func TestNewSwapRoundTrip(t *testing.T) {
 	if !strings.Contains(out, "router.go") {
 		t.Fatalf("refusal did not name the edited file:\n%s", out)
 	}
+
+	// diff sees the same truth the guard enforced.
+	out, err = mgo(t, bin, app, "diff")
+	if err != nil {
+		t.Fatalf("mgo diff: %v\n%s", err, out)
+	}
+	if !strings.Contains(out, "router.go") || !strings.Contains(out, "modified manually") {
+		t.Fatalf("diff did not report the edited file:\n%s", out)
+	}
+	if !strings.Contains(out, "handlers.go") || !strings.Contains(out, "unchanged") {
+		t.Fatalf("diff did not report unchanged files:\n%s", out)
+	}
+
+	// info reads the stack from the manifest.
+	out, err = mgo(t, bin, app, "info")
+	if err != nil {
+		t.Fatalf("mgo info: %v\n%s", err, out)
+	}
+	if !strings.Contains(out, "stdmux") || !strings.Contains(out, "demo") {
+		t.Fatalf("info missing stack details:\n%s", out)
+	}
+
+	// doctor: the project is healthy, edits and all.
+	out, err = mgo(t, bin, app, "doctor")
+	if err != nil {
+		t.Fatalf("mgo doctor: %v\n%s", err, out)
+	}
+	if !strings.Contains(out, "All clear") {
+		t.Fatalf("doctor not clear:\n%s", out)
+	}
 }
