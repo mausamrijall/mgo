@@ -10,10 +10,14 @@ import (
 	"database/sql"
 	"fmt"
 
+	"entgo.io/ent/dialect"
+	entsql "entgo.io/ent/dialect/sql"
 	"github.com/glebarez/sqlite" // registers database/sql driver "sqlite" too
 	dbsql "github.com/mgo-framework/mgo/adapters/db-sql"
+	mgoent "github.com/mgo-framework/mgo/adapters/orm-ent"
 	mgogorm "github.com/mgo-framework/mgo/adapters/orm-gorm"
 	"github.com/mgo-framework/mgo/contracts/orm"
+	"github.com/mgo-framework/mgo/examples/blog/ent"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -43,8 +47,33 @@ func openStore(driver, dsn string) (PostRepo, orm.Transactor, error) {
 		}
 		return sqlRepo{db}, db, nil
 
+	case "ent":
+		// ent requires the foreign_keys pragma on for SQLite. This is the
+		// modernc/glebarez driver's pragma syntax (mattn's would be _fk=1).
+		if dsn != "" && dsn[0] != ':' {
+			dsn += "?_pragma=foreign_keys(1)"
+		}
+		raw, err := sql.Open("sqlite", dsn)
+		if err != nil {
+			return nil, nil, err
+		}
+		drv := entsql.OpenDB(dialect.SQLite, raw)
+		client := ent.NewClient(ent.Driver(drv))
+		if err := client.Schema.Create(context.Background()); err != nil {
+			return nil, nil, err
+		}
+		tx := mgoent.New(
+			client.Tx,
+			ent.NewTxContext,
+			func(ctx context.Context) (*ent.Tx, bool) {
+				t := ent.TxFromContext(ctx)
+				return t, t != nil
+			},
+		)
+		return entRepo{client}, tx, nil
+
 	default:
-		return nil, nil, fmt.Errorf("unknown db driver %q (want gorm or sql)", driver)
+		return nil, nil, fmt.Errorf("unknown db driver %q (want gorm, sql, or ent)", driver)
 	}
 }
 
@@ -95,4 +124,36 @@ func (r sqlRepo) List(ctx context.Context) ([]Post, error) {
 		posts = append(posts, p)
 	}
 	return posts, rows.Err()
+}
+
+// ---- ent repository: native ent calls ----
+
+type entRepo struct{ client *ent.Client }
+
+func (r entRepo) Create(ctx context.Context, title string) (int64, error) {
+	client := r.client
+	if tx := ent.TxFromContext(ctx); tx != nil {
+		client = tx.Client()
+	}
+	p, err := client.Post.Create().SetTitle(title).Save(ctx)
+	if err != nil {
+		return 0, err
+	}
+	return int64(p.ID), nil
+}
+
+func (r entRepo) List(ctx context.Context) ([]Post, error) {
+	client := r.client
+	if tx := ent.TxFromContext(ctx); tx != nil {
+		client = tx.Client()
+	}
+	posts, err := client.Post.Query().Order(ent.Asc("id")).All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]Post, len(posts))
+	for i, p := range posts {
+		out[i] = Post{ID: int64(p.ID), Title: p.Title}
+	}
+	return out, nil
 }

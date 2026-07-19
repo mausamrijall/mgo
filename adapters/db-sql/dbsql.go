@@ -47,9 +47,17 @@ func New(db *sql.DB) *DB { return &DB{DB: db} }
 
 type ctxKey struct{}
 
+// TxFromContext returns the transaction carried by ctx (inside InTx).
+// Prefer From for queries; this exists for glue that needs the raw *sql.Tx
+// (e.g. rebinding sqlc-generated Queries via WithTx).
+func TxFromContext(ctx context.Context) (*sql.Tx, bool) {
+	tx, ok := ctx.Value(ctxKey{}).(*sql.Tx)
+	return tx, ok
+}
+
 // From returns the transaction carried by ctx (inside InTx) or db itself.
 func From(ctx context.Context, db *DB) Querier {
-	if tx, ok := ctx.Value(ctxKey{}).(*sql.Tx); ok {
+	if tx, ok := TxFromContext(ctx); ok {
 		return tx
 	}
 	return db.DB
@@ -59,7 +67,7 @@ func From(ctx context.Context, db *DB) Querier {
 // commit on nil, roll back on error or panic (re-raised). A ctx already
 // carrying a transaction joins it.
 func (d *DB) InTx(ctx context.Context, fn func(ctx context.Context) error) error {
-	if _, ok := ctx.Value(ctxKey{}).(*sql.Tx); ok {
+	if _, ok := TxFromContext(ctx); ok {
 		return fn(ctx) // join the enclosing transaction
 	}
 	tx, err := d.BeginTx(ctx, nil)

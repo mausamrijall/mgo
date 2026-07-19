@@ -1,9 +1,10 @@
-// Command blog is the Phase 4 exit demo: the SAME application on GORM or
-// raw database/sql, chosen by config — identical bootstrap shape, shared
-// handlers, txn-in-ctx working across both:
+// Command blog is the Phase 4 exit demo: the SAME application on GORM,
+// raw database/sql, or ent, chosen by config — identical bootstrap shape,
+// shared handlers, txn-in-ctx working across all three:
 //
 //	MGO_DB_DRIVER=gorm go run .   # default
 //	MGO_DB_DRIVER=sql  go run .
+//	MGO_DB_DRIVER=ent  go run .
 //
 // Endpoints:
 //

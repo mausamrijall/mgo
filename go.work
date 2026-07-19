@@ -3,7 +3,10 @@ go 1.26.5
 use (
 	./adapters/db-sql
 	./adapters/middleware-cors
+	./adapters/migrate-goose
+	./adapters/orm-ent
 	./adapters/orm-gorm
+	./adapters/orm-sqlc
 	./adapters/router-chi
 	./adapters/router-stdmux
 	./contracts
