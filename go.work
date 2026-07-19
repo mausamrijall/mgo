@@ -2,6 +2,7 @@ go 1.26.5
 
 use (
 	./adapters/auth-jwt
+	./adapters/cache-redis
 	./adapters/db-sql
 	./adapters/hash-argon2
 	./adapters/middleware-cors
@@ -9,7 +10,9 @@ use (
 	./adapters/orm-ent
 	./adapters/orm-gorm
 	./adapters/orm-sqlc
+	./adapters/queue-asynq
 	./adapters/router-chi
+	./adapters/sched-gocron
 	./adapters/session-scs
 	./adapters/router-stdmux
 	./cli
