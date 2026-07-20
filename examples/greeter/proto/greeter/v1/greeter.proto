@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package greeter.v1;
+
+option go_package = "github.com/mgo-framework/mgo/examples/greeter/gen/greeter/v1;greeterv1";
+
+// GreeterService is the extracted service boundary. The Go interface it
+// mirrors (main.Greeter) existed before the wire did — extraction, not
+// rewrite.
+service GreeterService {
+  rpc Greet(GreetRequest) returns (GreetResponse);
+}
+
+message GreetRequest {
+  string name = 1;
+}
+
+message GreetResponse {
+  string greeting = 1;
+}

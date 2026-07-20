@@ -4,6 +4,7 @@ use (
 	./adapters/auth-jwt
 	./adapters/cache-redis
 	./adapters/db-sql
+	./adapters/grpc-server
 	./adapters/hash-argon2
 	./adapters/middleware-cors
 	./adapters/migrate-goose
@@ -19,6 +20,7 @@ use (
 	./contracts
 	./examples/authdemo
 	./examples/blog
+	./examples/greeter
 	./examples/hello
 	./examples/routing
 	./framework

@@ -1,0 +1,26 @@
+module github.com/mgo-framework/mgo/examples/greeter
+
+go 1.26.5
+
+require (
+	github.com/mgo-framework/mgo/adapters/grpc-server v0.0.0
+	github.com/mgo-framework/mgo/adapters/router-stdmux v0.0.0
+	github.com/mgo-framework/mgo/contracts v0.0.0
+	github.com/mgo-framework/mgo/framework v0.0.0
+	google.golang.org/grpc v1.69.2
+	google.golang.org/protobuf v1.36.0
+)
+
+require (
+	golang.org/x/net v0.30.0 // indirect
+	golang.org/x/sys v0.26.0 // indirect
+	golang.org/x/text v0.19.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20241015192408-796eee8c2d53 // indirect
+)
+
+replace (
+	github.com/mgo-framework/mgo/adapters/grpc-server => ../../adapters/grpc-server
+	github.com/mgo-framework/mgo/adapters/router-stdmux => ../../adapters/router-stdmux
+	github.com/mgo-framework/mgo/contracts => ../../contracts
+	github.com/mgo-framework/mgo/framework => ../../framework
+)
