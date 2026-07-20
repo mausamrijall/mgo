@@ -15,9 +15,9 @@ var bufferKey bufferKeyT
 // buffer collects events emitted inside a transaction and flushes them
 // once, after commit. It never flushes on rollback.
 type buffer struct {
-	mu       sync.Mutex
-	pending  []func(ctx context.Context) error
-	flushed  bool
+	mu      sync.Mutex
+	pending []func(ctx context.Context) error
+	flushed bool
 }
 
 func (buf *buffer) add(fn func(ctx context.Context) error) {
