@@ -16,6 +16,7 @@ use (
 	./adapters/sched-gocron
 	./adapters/session-scs
 	./adapters/router-stdmux
+	./benchmarks
 	./cli
 	./contracts
 	./examples/authdemo
