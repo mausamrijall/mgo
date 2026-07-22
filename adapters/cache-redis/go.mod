@@ -4,7 +4,7 @@ go 1.26.5
 
 require (
 	github.com/mgo-framework/mgo/contracts v0.0.0
-	github.com/redis/go-redis/v9 v9.7.0
+	github.com/redis/go-redis/v9 v9.7.3
 )
 
 require github.com/alicebob/miniredis/v2 v2.34.0

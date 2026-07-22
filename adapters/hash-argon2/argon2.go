@@ -70,6 +70,13 @@ func Verify(password, encoded string) (bool, error) {
 	if _, err := fmt.Sscanf(parts[3], "m=%d,t=%d,p=%d", &p.Memory, &p.Iterations, &p.Parallelism); err != nil {
 		return false, fmt.Errorf("mgoargon2: bad params %q", parts[3])
 	}
+	// Reject hostile parameters BEFORE deriving: x/crypto/argon2 panics
+	// on zero iterations/parallelism, and an attacker-supplied huge
+	// memory cost would be a denial of service. Legitimate hashes from
+	// any sane profile sit far inside these bounds.
+	if p.Iterations < 1 || p.Parallelism < 1 || p.Memory < 8*uint32(p.Parallelism) || p.Memory > 4*1024*1024 {
+		return false, fmt.Errorf("mgoargon2: params out of bounds %q", parts[3])
+	}
 	salt, err := base64.RawStdEncoding.DecodeString(parts[4])
 	if err != nil {
 		return false, fmt.Errorf("mgoargon2: bad salt encoding")
@@ -77,6 +84,11 @@ func Verify(password, encoded string) (bool, error) {
 	want, err := base64.RawStdEncoding.DecodeString(parts[5])
 	if err != nil {
 		return false, fmt.Errorf("mgoargon2: bad hash encoding")
+	}
+	// Degenerate salts/keys are never produced by a real hasher and some
+	// (zero-length keys) crash the KDF.
+	if len(salt) < 8 || len(want) < 16 || len(want) > 512 {
+		return false, fmt.Errorf("mgoargon2: salt or hash length out of bounds")
 	}
 	got := argon2.IDKey([]byte(password), salt, p.Iterations, p.Memory, p.Parallelism, uint32(len(want)))
 	return subtle.ConstantTimeCompare(got, want) == 1, nil
